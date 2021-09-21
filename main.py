@@ -5,7 +5,7 @@ import requests
 HOST = ''
 PORT = 5555
 HTTP = "https://shrouded-wave-12457.herokuapp.com/"
-BUFFER_SIZE = 20
+#HTTP = "http://localhost:3000/"
 BUFFER = {}
 
 
@@ -21,12 +21,12 @@ def send_to_server(public_ip):
         average /= len(BUFFER[local_ip])
 
         sensor_id = public_ip + "-" + local_ip
-        destination = f"{HTTP}insert?SensorID={sensor_id}&Timestamp={begin_ts}&Temperatura={average}"
+        destination = f"{HTTP}insert?sensor_id={sensor_id}&temperatura={average}&timestamp={begin_ts}"
 
         print("Fazendo request para: " + destination)
         BUFFER[local_ip].clear()
-    #r = requests.get(destination)
-    #if r.status_code != 200: print("Erro ao enviar para o servidor!")
+    r = requests.get(destination)
+    if r.status_code != 200: print("Erro ao enviar para o servidor!")
 
 def get_public_ip():
     endpoint = 'https://ipinfo.io/json'
@@ -64,7 +64,7 @@ def main():
             else: BUFFER[local_ip] = [data]
 
             #if len(BUFFER[local_ip]) == BUFFER_SIZE: send_to_server(local_ip)
-            if current_ts - begin_ts >= 5:
+            if current_ts - begin_ts >= 15:
                 begin_ts = None
                 send_to_server(public_ip)
 
