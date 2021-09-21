@@ -34,8 +34,8 @@ def get_public_ip():
     response = requests.get(endpoint, verify = True)
 
     if response.status_code != 200:
-        return 'Status:', response.status_code, 'Problem with the request. Exiting.'
-        exit()
+        print('Status:', response.status_code, 'Problem with the request. Exiting.')
+        sys.exit(1)
 
     data = response.json()
 
