@@ -1,6 +1,7 @@
 import socket
 import time
 import requests
+import sys
 
 HOST = ''
 PORT = 5555
@@ -40,12 +41,13 @@ def get_public_ip():
 
     return data['ip']
 
-def main():
+def main(delta_time=30):
     public_ip = get_public_ip()
 
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:  
         s.bind((HOST, PORT))
-        print('Aguardando dados ...' )
+        print("Delta Time =", delta_time)
+        print('Aguardando dados...' )
         begin_ts = None
         while (1):
             message, address = s.recvfrom(8192)
@@ -63,10 +65,11 @@ def main():
             if local_ip in BUFFER: BUFFER[local_ip].append(data)
             else: BUFFER[local_ip] = [data]
 
-            #if len(BUFFER[local_ip]) == BUFFER_SIZE: send_to_server(local_ip)
-            if current_ts - begin_ts >= 15:
+            if current_ts - begin_ts >= delta_time:
                 begin_ts = None
                 send_to_server(public_ip)
 
 if __name__ == "__main__":
-    main()
+    argv = sys.argv[1:]
+    if len(argv) == 1: main(int(argv[0]))
+    else: main()
